@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Edge</title>
+<meta name="description" content="Edge. Blockchain trading and market intelligence for agents and their humans." />
+<meta name="theme-color" content="#7DFF32" />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" href="icon.svg" />
+<link rel="apple-touch-icon" href="icon.svg" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Edge" />
+<meta property="og:title" content="Edge" />
+<meta property="og:description" content="Blockchain trading and market intelligence for agents and their humans." />
+<meta property="og:image" content="https://edge.trade/og.png" />
+<meta property="og:url" content="https://edge.trade" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Edge" />
+<meta name="twitter:description" content="Blockchain trading and market intelligence for agents and their humans." />
+<meta name="twitter:image" content="https://edge.trade/og.png" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="fonts/BomstadDisplay-SemiBold.woff2" />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  @font-face {
+    font-family: 'BomstadDisplay';
+    src: url('fonts/BomstadDisplay-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+  :root {
+    --bg: #0e0e0e;
+    --text: #ffffff;
+    --dimmed: #828282;
+    --faint: #4a4a4a;
+    --green: #63ff09;
+    --green-soft: #7dff32;
+    --pink: #ec397a;
+    --mono: 'Ubuntu Mono', ui-monospace, 'SF Mono', monospace;
+    --display: 'BomstadDisplay', 'Geist', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--display);
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* background terminal */
+  .terminal {
+    position: fixed; inset: 0;
+    padding: 38px 6vw;
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--faint);
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow: hidden;
+    opacity: 0.62;
+    z-index: 0;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 16%, #000 84%, transparent 100%);
+            mask-image: linear-gradient(180deg, transparent 0, #000 16%, #000 84%, transparent 100%);
+  }
+  .terminal .ln { display: block; }
+  .terminal .prompt { color: var(--green); }
+  .terminal .cmd { color: #d0d0d0; }
+  .terminal .flag { color: var(--dimmed); }
+  .terminal .ok { color: var(--green-soft); }
+  .terminal .dim { color: #6f6f6f; }
+  .terminal .up { color: var(--green-soft); }
+  .terminal .down { color: var(--pink); }
+  .terminal .cursor {
+    display: inline-block; width: 8px; height: 1.05em; vertical-align: -2px;
+    background: var(--green); margin-left: 2px; animation: blink 1.05s steps(1) infinite;
+  }
+  @keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+
+  /* vignette + scanlines */
+  .fx {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 55% at 50% 48%, rgba(14,14,14,0.92) 0%, rgba(14,14,14,0.66) 38%, rgba(14,14,14,0.15) 64%, transparent 80%),
+      repeating-linear-gradient(180deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0.10) 3px);
+  }
+  .fx::after {
+    content: ""; position: absolute; top: 44%; left: 50%; transform: translate(-50%, -50%);
+    width: 720px; height: 720px;
+    background: radial-gradient(circle at center, rgba(99,255,9,0.14) 0%, rgba(99,255,9,0.03) 40%, transparent 70%);
+  }
+
+  /* brand lockup */
+  .stage {
+    position: relative; z-index: 2;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 24px;
+  }
+  .mark {
+    height: clamp(86px, 13vw, 132px); margin-bottom: 26px;
+    filter: drop-shadow(0 0 26px rgba(99,255,9,0.55));
+    animation: float 6s ease-in-out infinite;
+  }
+  .mark svg { height: 100%; width: auto; display: block; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+
+  .wordmark {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(36px, 8vw, 78px);
+    line-height: 1;
+    letter-spacing: 0.01em;
+    color: var(--text);
+    text-shadow: 0 0 38px rgba(99,255,9,0.28);
+  }
+
+  .status {
+    margin-top: 26px;
+    font-family: var(--mono);
+    font-size: clamp(13px, 2.2vw, 16px);
+    color: var(--dimmed);
+    display: inline-flex; align-items: center;
+  }
+  .status .p { color: var(--green); margin-right: 8px; }
+  .status .blink {
+    display: inline-block; width: 8px; height: 1.05em; vertical-align: -2px;
+    background: var(--green); margin-left: 6px; animation: blink 1.05s steps(1) infinite;
+  }
+
+  /* social */
+  .social {
+    position: fixed; z-index: 3;
+    left: 50%; bottom: 30px; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 24px;
+  }
+  .social a {
+    color: var(--dimmed); display: inline-flex;
+    transition: color 0.18s ease, transform 0.18s ease;
+  }
+  .social a:hover { color: var(--green); transform: translateY(-2px); }
+  .social svg { width: 20px; height: 20px; fill: currentColor; display: block; }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  @media (max-width: 640px) {
+    .terminal { font-size: 12px; padding: 26px 18px; }
+    .mark { margin-bottom: 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mark { animation: none; }
+    .cursor, .blink { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="terminal" id="term" aria-hidden="true"></div>
+  <div class="fx" aria-hidden="true"></div>
+
+  <main class="stage">
+    <div class="mark">
+      <svg viewBox="0 0 38 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 12.6539V30.3906M4 12.6539L19.0831 4.13477M4 12.6539L34.5852 30.3906M4 30.3906L19.0831 39.608M4 30.3906L34.5852 12.6539M19.0831 39.608L34.5852 30.3906M19.0831 39.608V4.13477M34.5852 30.3906V12.6539M34.5852 12.6539L19.0831 4.13477"
+          stroke="#63FF09" stroke-width="2.23454" />
+      </svg>
+    </div>
+    <h1 class="wordmark">EDGE</h1>
+    <div class="status"><span class="p">&#10095;</span>coming soon<span class="blink"></span></div>
+    <p class="sr-only">Edge. Blockchain trading and market intelligence for agents and their humans. Coming soon.</p>
+  </main>
+
+  <footer class="social">
+    <a href="https://x.com/EdgeTrade" target="_blank" rel="noopener noreferrer" aria-label="Edge on X">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/></svg>
+    </a>
+    <a href="https://discord.gg/VwdYZV5d" target="_blank" rel="noopener noreferrer" aria-label="Edge on Discord">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.369a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.249-1.844-.276-3.68-.276-5.486 0-.164-.393-.406-.874-.617-1.249a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.369a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03ZM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418Zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418Z"/></svg>
+    </a>
+  </footer>
+
+<script>
+(function () {
+  var term = document.getElementById('term');
+  var PROMPT = { text: 'edge ❯ ', cls: 'prompt' };
+
+  var steps = [
+    { cmd: [ {text:'npx -y '}, {text:'@edgedottrade/edge', cls:'cmd'}, {text:' --api-key sk-••••••••', cls:'flag'} ],
+      out: [ [ {text:'✔ ', cls:'ok'}, {text:'mcp server ready · 5 namespaces · 32 actions · 8 chains', cls:'dim'} ] ] },
+    { cmd: [ {text:'intelligence', cls:'cmd'}, {text:' search_tokens'}, {text:' --chain solana "WIF"', cls:'flag'} ],
+      out: [ [ {text:'◦ 3 pairs · mcap $182M · liq $4.1M · vol24h $61M', cls:'dim'} ] ] },
+    { cmd: [ {text:'tokens', cls:'cmd'}, {text:' token_top_holders'}, {text:' --chain base 0x6982…1933', cls:'flag'} ],
+      out: [ [ {text:'◦ top10 27%  snipers 4%  insiders 2%  bundlers 0%', cls:'dim'} ] ] },
+    { cmd: [ {text:'pairs', cls:'cmd'}, {text:' pair_metrics'}, {text:' --interval 1h', cls:'flag'} ],
+      out: [ [ {text:'◦ vol $182K  buys 1,204  sells 980  ', cls:'dim'}, {text:'Δ +38.2%', cls:'up'} ] ] },
+    { cmd: [ {text:'intelligence', cls:'cmd'}, {text:' screen_tokens'}, {text:' --min-liq 5000 --max-snipers 20', cls:'flag'} ],
+      out: [ [ {text:'◦ 24 tokens matched · sorted by creation_timestamp', cls:'dim'} ] ] },
+    { cmd: [ {text:'wallet', cls:'cmd'}, {text:' wallet_summary'}, {text:' --chain ethereum', cls:'flag'} ],
+      out: [ [ {text:'◦ realized ', cls:'dim'}, {text:'+2.41 ETH', cls:'up'}, {text:'  ·  unrealized ', cls:'dim'}, {text:'-0.18 ETH', cls:'down'} ] ] },
+    { cmd: [ {text:'orders', cls:'cmd'}, {text:' trade'}, {text:' --side buy --amount 0.5 --preset flashbot', cls:'flag'} ],
+      out: [ [ {text:'✔ ', cls:'ok'}, {text:'filled · 1% fee · non-custodial · tx 5UfD…FdNFr', cls:'dim'} ] ] },
+  ];
+
+  var seed = [
+    [ PROMPT, {text:'tokens', cls:'cmd'}, {text:' token_info_with_pricing'}, {text:' --chain solana EPjF…Dt1v', cls:'flag'} ],
+    [ {text:'◦ USDC · $1.00 · liq $48.2M · pair HWy1…DHB8', cls:'dim'} ],
+    [ PROMPT, {text:'pairs', cls:'cmd'}, {text:' pair_ohlcv'}, {text:' --interval 1hr --count 24', cls:'flag'} ],
+    [ {text:'◦ 24 candles · last close $0.0413 ', cls:'dim'}, {text:'▲', cls:'up'} ],
+    [ PROMPT, {text:'tokens', cls:'cmd'}, {text:' token_top_traders'}, {text:' --chain arbitrum', cls:'flag'} ],
+    [ {text:'◦ #1 7xKX…gAsU  ', cls:'dim'}, {text:'+$84.2K', cls:'up'}, {text:'  ·  #2 3pQ…  ', cls:'dim'}, {text:'+$51.9K', cls:'up'} ],
+    [ PROMPT, {text:'wallet', cls:'cmd'}, {text:' native_balances'} ],
+    [ {text:'◦ sol 12.4  ·  eth 3.08  ·  base 0.92', cls:'dim'} ],
+  ];
+
+  var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+  var MAX_LINES = 64;
+
+  async function waitVisible() { while (document.hidden) { await sleep(400); } }
+
+  function seg(s) {
+    var el = document.createElement('span');
+    if (s.cls) el.className = s.cls;
+    el.textContent = s.text;
+    return el;
+  }
+
+  function trim() { while (term.childNodes.length > MAX_LINES) term.removeChild(term.firstChild); }
+
+  function addLine(segs) {
+    var ln = document.createElement('span');
+    ln.className = 'ln';
+    for (var i = 0; i < segs.length; i++) ln.appendChild(seg(segs[i]));
+    term.appendChild(ln); trim(); term.scrollTop = term.scrollHeight;
+    return ln;
+  }
+
+  async function typeCmd(segs) {
+    var ln = document.createElement('span');
+    ln.className = 'ln';
+    ln.appendChild(seg(PROMPT));
+    var cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    ln.appendChild(cursor);
+    term.appendChild(ln); trim(); term.scrollTop = term.scrollHeight;
+    for (var s = 0; s < segs.length; s++) {
+      var span = document.createElement('span');
+      if (segs[s].cls) span.className = segs[s].cls;
+      ln.insertBefore(span, cursor);
+      var t = segs[s].text;
+      for (var i = 0; i < t.length; i++) {
+        span.textContent += t[i];
+        term.scrollTop = term.scrollHeight;
+        await sleep(16 + Math.random() * 24);
+      }
+    }
+    ln.removeChild(cursor);
+  }
+
+  async function run() {
+    for (var i = 0; i < seed.length; i++) addLine(seed[i]);
+    var idx = 0;
+    while (true) {
+      await waitVisible();
+      var step = steps[idx % steps.length];
+      await sleep(620);
+      await typeCmd(step.cmd);
+      await sleep(260);
+      for (var k = 0; k < step.out.length; k++) { addLine(step.out[k]); await sleep(150); }
+      idx++;
+    }
+  }
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) {
+    for (var i = 0; i < seed.length; i++) addLine(seed[i]);
+    for (var j = 0; j < steps.length; j++) addLine([PROMPT].concat(steps[j].cmd));
+  } else {
+    run();
+  }
+})();
+</script>
+</body>
+</html>
